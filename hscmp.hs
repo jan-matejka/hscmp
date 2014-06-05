@@ -1,14 +1,15 @@
 import System.Environment
 import System.IO
 import Data.String.Utils
+import qualified Data.ByteString as BS
 
 compareF :: FilePath -> FilePath -> IO Bool
 compareF x y = do
     hx <- openBinaryFile x ReadMode
     hy <- openBinaryFile y ReadMode
 
-    xs <- hGetContents hx
-    ys <- hGetContents hy
+    xs <- BS.hGetContents hx
+    ys <- BS.hGetContents hy
 
     return $ compare xs ys == EQ
 
