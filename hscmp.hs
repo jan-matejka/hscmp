@@ -10,7 +10,7 @@ compareF x y = do
     xs <- hGetContents hx
     ys <- hGetContents hy
 
-    return $ (compare xs ys) == EQ
+    return $ compare xs ys == EQ
 
 usage = join "\n" [
       "Usage: $0 file1 file2"
@@ -24,4 +24,4 @@ main = do
         then putStrLn usage
         else do
             x <- compareF (head args) (last args)
-            putStrLn $ show x
+            print x
