@@ -1,14 +1,11 @@
 import System.Environment
-import System.IO
 import Data.String.Utils
+import System.IO.MMap
 
 compareF :: FilePath -> FilePath -> IO Bool
 compareF x y = do
-    hx <- openBinaryFile x ReadMode
-    hy <- openBinaryFile y ReadMode
-
-    xs <- hGetContents hx
-    ys <- hGetContents hy
+    xs <- mmapFileByteString x Nothing
+    ys <- mmapFileByteString y Nothing
 
     return $ compare xs ys == EQ
 
