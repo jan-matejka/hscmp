@@ -1,13 +1,6 @@
-import Prelude hiding (compare)
 import System.Environment
 import System.IO
 import Data.String.Utils
-
-compare :: String -> String -> Bool
-compare [] [] = True
-compare (x:xs) (y:ys) = if x == y
-    then compare xs ys
-    else False
 
 compareF :: FilePath -> FilePath -> IO Bool
 compareF x y = do
@@ -17,7 +10,7 @@ compareF x y = do
     xs <- hGetContents hx
     ys <- hGetContents hy
 
-    return $ compare xs ys
+    return $ (compare xs ys) == EQ
 
 usage = join "\n" [
       "Usage: $0 file1 file2"
