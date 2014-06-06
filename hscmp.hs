@@ -7,14 +7,14 @@ import System.Exit
 import System.IO
 import System.IO.Error
 
-usage = join "\n" [
-      "Usage: $0 file1 file2"
-    ]
+usage prog = "Usage: " ++ prog ++ " [-s] file1 file2"
 
 main = do
     args <- getArgs
     if length args /= 2
-        then putStrLn usage
+        then do
+            prog <- getProgName
+            putStrLn $ usage prog
         else do
             let x = head args
                 y = last args
