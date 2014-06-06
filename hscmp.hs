@@ -1,18 +1,23 @@
 import System.Environment
 import Data.String.Utils
 import System.IO.MMap
+import System.IO.Error
+import System.IO
+import System.Exit
 
-compareF :: FilePath -> FilePath -> IO Bool
+compareF :: FilePath -> FilePath -> IO ()
 compareF x y = do
     xs <- mmapFileByteString x Nothing
     ys <- mmapFileByteString y Nothing
 
-    return $ compare xs ys == EQ
+    exitWith $ rc $ compare xs ys
+        where
+            rc :: Ordering -> ExitCode
+            rc EQ = ExitSuccess
+            rc _  = ExitFailure 1
 
 usage = join "\n" [
       "Usage: $0 file1 file2"
-    , ""
-    , "prints True if files do not differ. Otherwise False"
     ]
 
 main = do
@@ -20,5 +25,9 @@ main = do
     if length args /= 2
         then putStrLn usage
         else do
-            x <- compareF (head args) (last args)
-            print x
+            result <- tryIOError $ compareF (head args) (last args)
+            case result of
+                Left err -> do
+                    hPrint stderr err
+                    exitWith $ ExitFailure 2
+                Right x -> return x

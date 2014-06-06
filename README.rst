@@ -4,8 +4,8 @@ HsCmp
 
 Tool `cmp` from diffutils written haskell.
 
-Currently it can only print `True` or `False` as an aswer to question
-Does these two files differ?
+Currently it can only exit with 0 or 1 where 0 means files are equal, 1
+not equal
 
 Build
 =====
