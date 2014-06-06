@@ -1,20 +1,11 @@
-import System.Environment
+module Main where
+
+import HsCmp
 import Data.String.Utils
-import System.IO.MMap
-import System.IO.Error
-import System.IO
+import System.Environment
 import System.Exit
-
-compareF :: FilePath -> FilePath -> IO ()
-compareF x y = do
-    xs <- mmapFileByteString x Nothing
-    ys <- mmapFileByteString y Nothing
-
-    exitWith $ rc $ compare xs ys
-        where
-            rc :: Ordering -> ExitCode
-            rc EQ = ExitSuccess
-            rc _  = ExitFailure 1
+import System.IO
+import System.IO.Error
 
 usage = join "\n" [
       "Usage: $0 file1 file2"
@@ -25,9 +16,14 @@ main = do
     if length args /= 2
         then putStrLn usage
         else do
-            result <- tryIOError $ compareF (head args) (last args)
+            let x = head args
+                y = last args
+            result <- tryIOError $ compareF x y
             case result of
                 Left err -> do
                     hPrint stderr err
                     exitWith $ ExitFailure 2
-                Right x -> return x
+                Right d -> case d of
+                    Same -> exitWith ExitSuccess
+                    Differ _ _ -> do
+                        hPutStrLn stderr $ x ++ " " ++ y ++ " " ++ show d
