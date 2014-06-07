@@ -62,9 +62,9 @@ normalCompare silent xs = do
     print True  (Left err)   = exitWith $ ExitFailure 2
     print _     (Right Same) = exitSuccess
     print False (Right d)    = do
-        hPutStrLn stderr $ join " " $ xs ++ [show d]
-        print True (Right d)
-    print True (Right d)     = exitWith $ ExitFailure 1
+                               hPutStrLn stderr $ unwords $ xs ++ [show d]
+                               print True (Right d)
+    print True  (Right d)    = exitWith $ ExitFailure 1
 
 main = do
     args <- getArgs
