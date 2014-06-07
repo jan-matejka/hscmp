@@ -6,22 +6,21 @@ module HsCmp (
     )
 where
 
+import Prelude hiding (lines)
 import System.IO.MMap
 import Data.ByteString
 import Data.Word
 import Data.Word8
 
-data CmpResult = Same | Differ {
-      byte_cnt :: Int
-    , line_cnt :: Int
-    }
+data CmpResult = Same
+               | Differ{bytes :: Int, lines :: Int }
 
 instance Show CmpResult where
     show Same = ""
     show x = "differ: byte "
-             ++ show (byte_cnt x)
+             ++ show (bytes x)
              ++ ", line "
-             ++ show (line_cnt x)
+             ++ show (lines x)
 
 instance Eq CmpResult where
     Same == Same = True
@@ -29,11 +28,11 @@ instance Eq CmpResult where
     _ == _ = False
 
 cmp' :: Int -> Int -> [Word8] -> [Word8] -> CmpResult
-cmp' byte_cnt line_cnt [] []  = Same
-cmp' byte_cnt line_cnt (x:xs) (y:ys)
-    | x == _lf && x==y = cmp' (byte_cnt+1) (line_cnt+1) xs ys
-    | x == y = cmp' (byte_cnt+1) line_cnt xs ys
-    | otherwise = Differ byte_cnt line_cnt
+cmp' bytes lines [] []  = Same
+cmp' bytes lines (x:xs) (y:ys)
+    | x == _lf && x==y = cmp' (bytes+1) (lines+1) xs ys
+    | x == y = cmp' (bytes+1) lines xs ys
+    | otherwise = Differ bytes lines
 
 cmp xs ys = cmp' 1 1 (unpack xs) (unpack ys)
 

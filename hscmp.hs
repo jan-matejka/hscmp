@@ -20,9 +20,11 @@ instance Eq Args where
     File x == File y = x == y
     _ == _ = False
 
+silencers = ["-s", "--silent", "--quiet"]
+
 parseArgs [] = []
 parseArgs (a:args)
-    | any ((==) a) ["-s", "--silent", "--quiet"] = parseArgs args ++ [Silent]
+    | a `elem` silencers = parseArgs args ++ [Silent]
     | head a == '-' = error $ "Unknown argument " ++ a
     | otherwise = parseArgs args ++ [File a]
 
@@ -31,14 +33,7 @@ files (a:args) = case a of
     File x -> files args ++ [x]
     otherwise -> files args
 
-hasSilent pargs = any ((==) Silent) pargs
-
-printResult Same _  _  = exitWith ExitSuccess
-printResult d True  _  = exitWith $ ExitFailure 1
-printResult d False fs = do
-    hPutStrLn stderr $ join " " $ fs ++ [show d]
-    printResult d True fs
-
+hasSilent = elem Silent
 
 runCompare True  = optimizedCompare
 runCompare False = normalCompare False
@@ -65,7 +60,7 @@ normalCompare silent xs = do
                                hPrint stderr err
                                print False (Left err)
     print True  (Left err)   = exitWith $ ExitFailure 2
-    print _     (Right Same) = exitWith ExitSuccess
+    print _     (Right Same) = exitSuccess
     print False (Right d)    = do
         hPutStrLn stderr $ join " " $ xs ++ [show d]
         print True (Right d)
